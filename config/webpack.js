@@ -65,7 +65,7 @@ let webpackConfig = {
 				]
 			},
 			{
-				test: /\.(svg|png|jpg|gif)$/,
+				test: /\.(svg|png|jpg|gif|eot|woff|woff2|ttf)$/,
 				use: `url-loader?name=${ASSET_TEMPLATE}`
 			}
 		]
