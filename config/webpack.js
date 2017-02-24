@@ -1,26 +1,27 @@
-const path                  = require('path');
-const webpack               = require('webpack');
-const { CONFIG, PATHS }     = require('./config');
-const { ASSET_TEMPLATE }    = CONFIG;
+const path = require('path');
+const webpack = require('webpack');
+const { CONFIG, PATHS, UTILS } = require('./config');
+const { isExternal } = UTILS;
+const { ASSET_TEMPLATE } = CONFIG;
 const { SRC, DIST, ASSETS } = PATHS;
-const PAGES                 = require('./pages.config.js');
+const PAGES = require('./pages.config.js');
 
-const HtmlWebpackPlugin         = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const CommonsChunkPlugin        = require('webpack/lib/optimize/CommonsChunkPlugin');
+const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 
 let webpackConfig = {
 	devtool: 'eval',
-	watch:   true,
-	cache:   true,
+	watch: true,
+	cache: true,
 
 	entry: {
-		'app': path.join(SRC, 'js/app.js')
+		'app': path.join(SRC, 'js/main.js')
 	},
 
 	output: {
-		path:          DIST,
-		filename:      '[name].js',
+		path: DIST,
+		filename: '[name].js',
 		chunkFilename: '[id]-chunk.js',
 	},
 
@@ -28,7 +29,7 @@ let webpackConfig = {
 		extensions: [
 			'.js'
 		],
-		alias:      {
+		alias: {
 			"assets": ASSETS
 		}
 	},
@@ -36,19 +37,19 @@ let webpackConfig = {
 	module: {
 		rules: [
 			{
-				test:    /\.js$/,
-				use:     'babel-loader',
+				test: /\.js$/,
+				use: 'babel-loader',
 				exclude: /node_modules/
 			},
 
 			{
 				test: /\.pug/,
-				use:  'pug-loader'
+				use: 'pug-loader'
 			},
 
 			{
 				test: /\.scss$/,
-				use:  [
+				use: [
 					{
 						loader: 'style-loader'
 					},
@@ -65,21 +66,21 @@ let webpackConfig = {
 			},
 			{
 				test: /\.(svg|png|jpg|gif)$/,
-				use:  `url-loader?name=${ASSET_TEMPLATE}`
+				use: `url-loader?name=${ASSET_TEMPLATE}`
 			}
 		]
 	},
 
 	plugins: [
 		new CommonsChunkPlugin({
-			name:      'common',
+			name: 'common',
 			minChunks: function (module, count) {
 				return !isExternal(module) && count >= 2; // adjustable cond
 			}
 		}),
 		new CommonsChunkPlugin({
-			name:      'vendors',
-			chunks:    ['common'],
+			name: 'vendors',
+			chunks: ['common'],
 			// or if you have an key value object for your entries
 			// chunks: Object.keys(entry).concat('common')
 			minChunks: function (module) {
@@ -88,22 +89,10 @@ let webpackConfig = {
 		})
 	]
 };
-
-function isExternal(module) {
-	let userRequest = module.userRequest;
-
-	if (typeof userRequest !== 'string') {
-		return false;
-	}
-
-	return userRequest.indexOf('node_modules') >= 0 ||
-		userRequest.indexOf('libraries') >= 0;
-}
-
 let items = Object.keys(PAGES).map((key, i) => {
 	let item = Object.assign({}, PAGES[key], {
 		alwaysWriteToDisk: true,
-		filename:          `${key}.html`
+		filename: `${key}.html`
 	});
 	return new HtmlWebpackPlugin(item);
 });

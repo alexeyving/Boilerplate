@@ -1,3 +1,2 @@
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap/dist/css/bootstrap-theme.css'
-import 'jquery/dist/jquery.min'
+import 'exports-loader?jQuery!script-loader!jquery/dist/jquery.min'
+import 'bootstrap'
